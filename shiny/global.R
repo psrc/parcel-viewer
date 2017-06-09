@@ -8,7 +8,7 @@ library(DT)
 # wrkdir <- '' #insert shiny path
 wrkdir <- 'C:/Users/CLam/Desktop/'
 
-data <- 'parcelviewer/data'
+data <- 'parcel-viewer/data'
 
 parcel.main <- 'parcels2014.rds'
 parcel.att <- 'parcels_for_viewer.rds'
