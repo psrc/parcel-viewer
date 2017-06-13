@@ -49,8 +49,8 @@ function(input, output, session) {
     expr <- lazyeval::interp(~col %in% numItems, col = as.name(sQueryBy()))
     parcels.filter <- parcels.attr %>% filter_(expr) 
     
-    if (nrow(parcels.filter) > 10000){
-      parcels.filter %>% sample_n(10000)
+    if (nrow(parcels.filter) > 5000){
+      parcels.filter %>% sample_n(5000)
     } else {
       parcels.filter
     }

@@ -28,7 +28,7 @@ navbarPage(theme = shinytheme("simplex"),
                                             label = "Clear all"),
                                br(),
                                br(),
-                               helpText("Geographic areas containing many parcels will be sampled to 10,000 parcels"),
+                               helpText("Geographic areas containing many parcels will be sampled to 5,000 parcels"),
                                br()
                                ), # end column
                         column(width = 10,
