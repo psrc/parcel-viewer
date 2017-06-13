@@ -16,3 +16,7 @@ parcel.att <- 'parcels_for_viewer.rds'
 parcels <- readRDS(file.path(wrkdir, data, parcel.main))
 attr <- readRDS(file.path(wrkdir, data, parcel.att))
 
+parcels.attr <- parcels %>% left_join(attr, by = "parcel_id")
+
+rm(attr)
+rm(parcels)

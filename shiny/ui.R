@@ -4,10 +4,20 @@ navbarPage(theme = shinytheme("simplex"),
                     tags$head(tags$script(src="gomap.js")),
                     fluidPage(
                       fluidRow(
-                        column(width = 3,
-                               h4("Enter one or more parcel_ids"),
-                               helpText("Separate multiple ids with commas"),
-                               textInput(inputId = "s_prcl_id",
+                        column(width = 2,
+                               selectInput(inputId = "s_queryBy",
+                                           label = h4("Query for parcels by:"),
+                                           choices = list("Parcel ID" = "parcel_id",
+                                                          "City" = "city_id",
+                                                          "TAZ" = "zone_id",
+                                                          "FAZ" = "faz_id"
+                                                          ),
+                                           width = '100%'
+                               ),
+                               br(),
+                               h4("Enter one or more ids"),
+                               helpText("Separate multiple ids with commas or type as range (i.e. 1000:2000)"),
+                               textInput(inputId = "s_id",
                                          label = "",
                                          width = '100%'
                                         ),
@@ -18,7 +28,7 @@ navbarPage(theme = shinytheme("simplex"),
                                br(),
                                br()
                                ), # end column
-                        column(width = 9,
+                        column(width = 10,
                                leafletOutput("map", height = "725px")
                                ) # end column
                       ), # end fluidRow
