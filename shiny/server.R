@@ -47,7 +47,13 @@ function(input, output, session) {
       numItems <- scan(text = values$ids, sep = ",", quiet = TRUE)
     }
     expr <- lazyeval::interp(~col %in% numItems, col = as.name(sQueryBy()))
-    parcels.attr %>% filter_(expr)
+    parcels.filter <- parcels.attr %>% filter_(expr) 
+    
+    if (nrow(parcels.filter) > 10000){
+      parcels.filter %>% sample_n(10000)
+    } else {
+      parcels.filter
+    }
   })
   
   # table manipulation
@@ -63,6 +69,7 @@ function(input, output, session) {
              nonres_bldg_sqft = nonres_building_sqft,
              num_hh = number_of_households,
              num_jobs = number_of_jobs,
+             num_bldgs = number_of_buildings,
              res_units = residential_units,
              gwthctr_id = growth_center_id,
              area = AREA,
@@ -71,10 +78,12 @@ function(input, output, session) {
       mutate(shape_area = round(shape_area, 10),
              area = round(area, 2),
              max_dua = round(max_dua, 2),
+             max_far = round(max_far, 2),
              lat = round(lat, 4),
              long = round(long, 4),
              locate = paste('<a class="go-map" href="" data-lat="', lat, '" data-long="', long, '"><i class="fa fa-crosshairs"></i></a>', sep="")) %>%
-      select(locate, county, parcel_id, city_id, zone_id, faz_id, gwthctr_id, area, shape_area, bldg_sqft:res_units, lat,long) 
+      select(locate, county, parcel_id, zone_id, faz_id, gwthctr_id, city_id, area, shape_area, parcel_sqft, bldg_sqft:res_units, lat,long)
+      
         
   })
   
@@ -120,7 +129,7 @@ function(input, output, session) {
       map <- leafletProxy("map")
       lat <- input$goto$lat
       lng <- input$goto$lng
-      map %>% setView(lng, lat, zoom = 16)
+      map %>% setView(lng, lat, zoom = 18)
     })
   })
   

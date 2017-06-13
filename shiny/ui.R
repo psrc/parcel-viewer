@@ -8,9 +8,10 @@ navbarPage(theme = shinytheme("simplex"),
                                selectInput(inputId = "s_queryBy",
                                            label = h4("Query for parcels by:"),
                                            choices = list("Parcel ID" = "parcel_id",
-                                                          "City" = "city_id",
                                                           "TAZ" = "zone_id",
-                                                          "FAZ" = "faz_id"
+                                                          "FAZ" = "faz_id",
+                                                          "Growth Center ID" = "growth_center_id",
+                                                          "City ID" = "city_id"
                                                           ),
                                            width = '100%'
                                ),
@@ -26,6 +27,8 @@ navbarPage(theme = shinytheme("simplex"),
                                actionButton(inputId = "s_clearButton",
                                             label = "Clear all"),
                                br(),
+                               br(),
+                               helpText("Geographic areas containing many parcels will be sampled to 10,000 parcels"),
                                br()
                                ), # end column
                         column(width = 10,
