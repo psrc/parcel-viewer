@@ -15,7 +15,7 @@ function(input, output, session) {
   values <- reactiveValues(ids = NULL)
   
   # Query by:
-  sQueryBy <- reactive({
+  sQueryBy <- eventReactive(input$s_goButton, {
     input$s_queryBy  
   })
   
