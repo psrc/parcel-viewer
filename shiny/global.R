@@ -5,9 +5,9 @@ library(dplyr)
 library(tidyverse)
 library(DT)
 
-# wrkdir <- '/home/shiny/apps/' # shiny path
+wrkdir <- '/home/shiny/apps/' # shiny path
 # wrkdir <- '/Users/hana/R/shinyserver/'
-wrkdir <- 'C:/Users/CLam/Desktop/'
+# wrkdir <- 'C:/Users/CLam/Desktop/'
 
 data <- 'parcel-viewer/data'
 

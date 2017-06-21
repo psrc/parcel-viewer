@@ -30,6 +30,31 @@ function(input, output, session) {
                          map.setView([47.549390, -122.008546],9);}"))
     )
   }  
+  
+  # format table
+  format.table <- function(sSelected) {
+    sSelected %>%
+      select(-(OBJECTID_12:PIN), -(MAJOR:Shape_Le_1), -(Shape_Length)) %>%
+      rename(county = COUNTY,
+             bldg_sqft = building_sqft, 
+             nonres_bldg_sqft = nonres_building_sqft,
+             num_hh = number_of_households,
+             num_jobs = number_of_jobs,
+             num_bldgs = number_of_buildings,
+             res_units = residential_units,
+             gwthctr_id = growth_center_id,
+             area = AREA,
+             shape_area = Shape_Area
+      ) %>%
+      mutate(shape_area = round(shape_area, 10),
+             area = round(area, 2),
+             max_dua = round(max_dua, 2),
+             max_far = round(max_far, 2),
+             lat = round(lat, 4),
+             long = round(long, 4)
+      ) %>%
+      select(county, parcel_id, zone_id, faz_id, gwthctr_id, city_id, area, shape_area, parcel_sqft, bldg_sqft:res_units, lat,long)
+  }
 
   # Search by Number -------------------------------------------------------- 
 
@@ -84,30 +109,9 @@ function(input, output, session) {
     if (is.null(sSelected())) return(NULL)
     
     sSelected <- sSelected()
-    
-    tbl <- sSelected %>%
-      select(-(OBJECTID_12:PIN), -(MAJOR:Shape_Le_1), -(Shape_Length)) %>%
-      rename(county = COUNTY,
-             bldg_sqft = building_sqft, 
-             nonres_bldg_sqft = nonres_building_sqft,
-             num_hh = number_of_households,
-             num_jobs = number_of_jobs,
-             num_bldgs = number_of_buildings,
-             res_units = residential_units,
-             gwthctr_id = growth_center_id,
-             area = AREA,
-             shape_area = Shape_Area
-             ) %>%
-      mutate(shape_area = round(shape_area, 10),
-             area = round(area, 2),
-             max_dua = round(max_dua, 2),
-             max_far = round(max_far, 2),
-             lat = round(lat, 4),
-             long = round(long, 4),
-             locate = paste('<a class="go-map" href="" data-lat="', lat, '" data-long="', long, '"><i class="fa fa-crosshairs"></i></a>', sep="")) %>%
-      select(locate, county, parcel_id, zone_id, faz_id, gwthctr_id, city_id, area, shape_area, parcel_sqft, bldg_sqft:res_units, lat,long)
-      
-        
+    format.table(sSelected) %>%
+      mutate(locate = paste('<a class="go-map" href="" data-lat="', lat, '" data-long="', long, '"><i class="fa fa-crosshairs"></i></a>', sep="")) %>%
+      select(locate, everything())
   })
   
   # display parcel_ids
@@ -150,7 +154,8 @@ function(input, output, session) {
 
 
   # Search by Click ---------------------------------------------------------  
-  
+
+    
   observe({
     event <- input$mapc_click
     if (is.null(event))
@@ -181,57 +186,17 @@ function(input, output, session) {
       }
     })
   
+  # table manipulation
   sTablecl <- reactive({
     if (is.null(sSelectedcl())) return(NULL)
     sSelected <- sSelectedcl()
-    
-    tbl <- sSelected %>%
-      select(-(OBJECTID_12:PIN), -(MAJOR:Shape_Le_1), -(Shape_Length)) %>%
-      rename(county = COUNTY,
-             bldg_sqft = building_sqft, 
-             nonres_bldg_sqft = nonres_building_sqft,
-             num_hh = number_of_households,
-             num_jobs = number_of_jobs,
-             num_bldgs = number_of_buildings,
-             res_units = residential_units,
-             gwthctr_id = growth_center_id,
-             area = AREA,
-             shape_area = Shape_Area
-      ) %>%
-      mutate(shape_area = round(shape_area, 10),
-             area = round(area, 2),
-             max_dua = round(max_dua, 2),
-             max_far = round(max_far, 2),
-             lat = round(lat, 4),
-             long = round(long, 4),
-             # ) %>%
-             locate = paste('<a class="go-map" href="" data-lat="', lat, '" data-long="', long, '"><i class="fa fa-crosshairs"></i></a>', sep="")) %>%
-      select(locate, county, parcel_id, zone_id, faz_id, gwthctr_id, city_id, area, shape_area, parcel_sqft, bldg_sqft:res_units, lat,long)
-    
-    
-  })
-  
-  ##Create new JS script? for this tabpanel? Change href? Will zoom to location but affects map in other tabpanel. 
-  # zoom to selected parcel in datatable when 'locate' icon is clicked
-  # Adapted from https://github.com/rstudio/shiny-examples/tree/master/063-superzip-example
-  observe({
-    if (is.null(input$goto2))
-      return()
-    isolate({
-      map <- leafletProxy("mapc")
-      lat <- input$goto2$lat
-      lng <- input$goto2$lng
-      map %>% setView(lng, lat, zoom = 18)
-    })
+    format.table(sSelected)
   })
   
   output$s_dtc <- DT::renderDataTable({
-    locate <- DT::dataTableAjax(session, sTablecl())
     DT::datatable(sTablecl(), 
                   extensions = 'Buttons', 
-                  caption = "Click on icon in 'locate' field to zoom to parcel",
-                  options = list(ajax = list(url = locate),
-                                 dom = 'Bfrtip',
+                  options = list(dom = 'Bfrtip',
                                  buttons = c('csv', 'excel')
                   ), 
                   escape = c(1))

@@ -37,7 +37,6 @@ navbarPage(theme = shinytheme("simplex"),
                       ), # end fluidRow
                       br(),
                       fluidRow(
-                        # column(width = 3),
                         column(width = 12,
                                DT::dataTableOutput("s_dt")
                                ) # end column
@@ -45,18 +44,18 @@ navbarPage(theme = shinytheme("simplex"),
                     ) # end fluidPage
            ), # end tabPanel
            tabPanel("Search by Click",
-              tags$head(tags$script(src="gomap2.js")),
               fluidPage(
-                      fluidRow(
-                        leafletOutput("mapc", height = "725px")
-                      ), # end fluidRow
-                      br(),
-                      fluidRow(
-                        # column(width = 3),
-                        #column(width = 12,
-                               DT::dataTableOutput("s_dtc")
-                        #) # end column
-                      ) # end fluidRow
+                fluidRow(
+                  h4("Click on map to identify parcel")
+                ),
+                br(),
+                fluidRow(
+                  leafletOutput("mapc", height = "725px")
+                ), # end fluidRow
+                br(),
+                fluidRow(
+                  DT::dataTableOutput("s_dtc")
+                ) # end fluidRow
               ) # end fluidPage
            )
 ) # end navbarPage
