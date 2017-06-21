@@ -45,7 +45,7 @@ navbarPage(theme = shinytheme("simplex"),
                     ) # end fluidPage
            ), # end tabPanel
            tabPanel("Search by Click",
-              tags$head(tags$script(src="gomap.js")),
+              tags$head(tags$script(src="gomap2.js")),
               fluidPage(
                       fluidRow(
                         leafletOutput("mapc", height = "725px")
