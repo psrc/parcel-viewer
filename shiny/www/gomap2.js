@@ -6,10 +6,9 @@ $(document).on("click", ".go-map", function(e) {
   var lat = $el.data("lat");
   var long = $el.data("long");
   $($("#nav a")[0]).tab("show");
-  Shiny.onInputChange("goto", {
+  Shiny.onInputChange("goto2", {
     lat: lat,
     lng: long,
     nonce: Math.random()
   });
 });
-
