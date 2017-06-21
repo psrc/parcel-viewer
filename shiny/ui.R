@@ -1,6 +1,6 @@
 navbarPage(theme = shinytheme("simplex"),
            "Parcel Viewer",
-           tabPanel("Search",
+           tabPanel("Search by Number",
                     tags$head(tags$script(src="gomap.js")),
                     fluidPage(
                       fluidRow(
@@ -43,5 +43,20 @@ navbarPage(theme = shinytheme("simplex"),
                                ) # end column
                       ) # end fluidRow
                     ) # end fluidPage
-           ) # end tabPanel
+           ), # end tabPanel
+           tabPanel("Search by Click",
+              tags$head(tags$script(src="gomap.js")),
+              fluidPage(
+                      fluidRow(
+                        leafletOutput("mapc", height = "725px")
+                      ), # end fluidRow
+                      br(),
+                      fluidRow(
+                        # column(width = 3),
+                        #column(width = 12,
+                               DT::dataTableOutput("s_dtc")
+                        #) # end column
+                      ) # end fluidRow
+              ) # end fluidPage
+           )
 ) # end navbarPage
