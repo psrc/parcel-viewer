@@ -5,30 +5,31 @@ function(input, output, session) {
   # reset/default map
   leaflet.blank <- function() {
     leaflet() %>%
-      addProviderTiles(providers$CartoDB.Positron) %>%
-      setView(lng = -122.008546, lat = 47.549390, zoom = 9)
-  }
-  
-  # show leaflet results
-  leaflet.results <- function(selected.data, popup) {
-    leaflet() %>%
-      addProviderTiles(providers$CartoDB.Positron, group = "Street Map") %>%
+      #addProviderTiles(providers$CartoDB.Positron, group = "Street Map") %>%
+      addProviderTiles(providers$Esri.WorldStreetMap, group = "Street Map") %>%
       addProviderTiles(providers$Esri.WorldImagery, group = "Imagery") %>%
-      addMarkers(data = selected.data,
-                 ~long,
-                 ~lat,
-                 popup = popup
-      ) %>%
       addLayersControl(
         baseGroups = c("Street Map", "Imagery")
       ) %>%
+      setView(lng = -122.008546, lat = 47.549390, zoom = 9) %>%
       addEasyButton(
         easyButton(
           icon="fa-globe", 
           title="Zoom to Region",
           onClick=JS("function(btn, map){ 
-                         map.setView([47.549390, -122.008546],9);}"))
-    )
+                     map.setView([47.549390, -122.008546],9);}"))
+          )
+  }
+  
+  # show leaflet results
+  leaflet.results <- function(proxy, selected.data, popup) {
+    proxy %>% 
+      clearMarkers() %>%
+      addMarkers(data = selected.data,
+                 ~long,
+                 ~lat,
+                 popup = popup
+      ) 
   }  
   
   # format table
@@ -82,6 +83,14 @@ function(input, output, session) {
                     value = " ")
   })
   
+  observeEvent(input$s_clearButton, {
+    values$ids = " "
+  })
+  
+  observeEvent(input$s_clearButton, {
+    leafletProxy("map") %>% clearMarkers()
+  })
+  
   # filter for selected ids based on sQueryBy()
   sSelected <- reactive({
     if (is.null(values$ids)) return(NULL)
@@ -114,17 +123,16 @@ function(input, output, session) {
       select(locate, everything())
   })
   
+  observe({
+    sSelected <- sSelected()
+    if (is.null(sSelected) || values$ids == " ") return()
+    marker.popup <- ~paste0("<strong>Parcel ID: </strong>", as.character(parcel_id))
+    leaflet.results(leafletProxy("map"), sSelected, marker.popup)
+  })
+  
   # display parcel_ids
   output$map <- renderLeaflet({
-    if (is.null(sSelected())) {
-      leaflet.blank()
-    } else if (values$ids == " ") {
-      leaflet.blank()
-    } else {
-    sSelected <- sSelected()
-    marker.popup <- ~paste0("<strong>Parcel ID: </strong>", as.character(parcel_id))
-    leaflet.results(sSelected, marker.popup)
-    }
+    leaflet.blank()
   })
   
   # zoom to selected parcel in datatable when 'locate' icon is clicked
@@ -172,18 +180,17 @@ function(input, output, session) {
     if (is.null(values.cl$ids)) return(NULL)
     parcels.attr %>% filter(parcel_id %in% values.cl$ids)
   })
+  
+  observe({
+    sSelected <- sSelectedcl()
+    if (is.null(sSelected) || values.cl$ids == " ") return()
+    marker.popup <- ~paste0("<strong>Parcel ID: </strong>", as.character(parcel_id))
+    leaflet.results(leafletProxy("mapc"), sSelected, marker.popup)
+  })
     
   # display parcel_ids by clicks on the map
   output$mapc <- renderLeaflet({
-    if (is.null(sSelectedcl())) {
-      leaflet.blank()
-    } else if (values.cl$ids == " ") {
-      leaflet.blank()
-    } else {
-      sSelected <- sSelectedcl()
-      marker.popup <- ~paste0("<strong>Parcel ID: </strong>", as.character(parcel_id))
-      leaflet.results(sSelected, marker.popup)
-      }
+    leaflet.blank()
     })
   
   # table manipulation
